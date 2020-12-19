@@ -1,29 +1,11 @@
 <template>
     <div class="calendar">
-        <button @click="buildCalendar(nowYear, nowMonth)">111</button>
-        <div class="year-month">{{ nowYear }} {{ months[nowMonth].text }}</div>
-        <!-- <table>
-			<thead>
-				<th>Sun</th>
-				<th>Mon</th>
-				<th>Tue</th>
-				<th>Wed</th>
-				<th>Thu</th>
-				<th>Fri</th>
-				<th>Sat</th>
-			</thead>
-			<tbody>
-				<tr>
-					<td>1</td>
-					<td>2</td>
-					<td>3</td>
-					<td>4</td>
-					<td>5</td>
-					<td>6</td>
-					<td>7</td>
-				</tr>
-			</tbody>
-		</table> -->
+        <!-- <button @click="buildCalendar(nowYear, nowMonth)">111</button> -->
+        <div class="year-month">
+            <span class="previous-month"></span>
+            {{ nowYear }} {{ months[nowMonth].text }}
+            <span class="next-month"></span>
+        </div>
         <v-row class="text-center">
             <v-col>Sun</v-col>
             <v-col>Mon</v-col>
@@ -34,30 +16,11 @@
             <v-col>Sat</v-col>
         </v-row>
 
-        <v-row class="text-center" v-for="(row, rowIndex) in weekNum" :key="row">
-            <v-col v-for="(cells, cellsIndex) in 7" :key="cells">
-                <!-- {{ cells + rowIndex * 7 }} -->
-                {{ setDay(cells, rowIndex) }}
+        <v-row class="text-center" v-for="row in weeks" :key="row.currentWeek">
+            <v-col v-for="cells in row.week" :key="cells">
+                {{ cells }}
             </v-col>
         </v-row>
-
-        <!-- <v-row class="text-center" v-for="(row, rowIndex) in 6" :key="row">
-            <v-col v-for="(cells, cellsIndex) in 7" :key="cells">
-                {{
-                    (() => {
-                        for (let i = 1; i < lastDay + 1; i++) {
-                            if (cells + rowIndex * 7 >= firstDay + 1) {
-                                return i
-                            }
-                        }
-                    })()
-                }}
-            </v-col>
-        </v-row> -->
-
-        <!-- <v-row class="text-center">
-			<v-col cols=""></v-col>
-		</v-row> -->
 
         <!-- 選月份 -->
         <!-- <v-row class="text-center">
@@ -89,14 +52,7 @@ export default {
             firstDay: null, //星期幾開始 0~6
             lastDay: null, //最後一天是幾號   可以用來當這個月有幾天
             weekNum: 0, //這個月有幾週
-            // weeks: [
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            // ],
+            weeks: [],
         }
     },
     computed: {},
@@ -104,13 +60,6 @@ export default {
         getYearRange() {
             // alert(this.nowYear)
         },
-        // tableMonths(rowIndex) {
-        // 	// rowIndex = rowIndex - 1
-        // 	let months = this.months.filter((month, index) => {
-        // 		return index < rowIndex * 4 && index >= (rowIndex - 1) * 4
-        // 	})
-        // 	return months
-        // },
         buildCalendar(year, month) {
             //取得第一天是在禮拜幾
             this.firstDay = new Date(year, month, 1).getDay()
@@ -122,17 +71,25 @@ export default {
                 return d.getDate()
             })()
             //計算這個月一共有幾週
-            this.weekNum = this.calculationWeekNum(this.firstDay, this.lastDay)
-            console.log(this.firstDay, this.lastDay)
+            let weekNum = this.calculationWeekNum(this.firstDay, this.lastDay)
 
-            // weeks: [
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            //     { days: [1, 2, 3, 4, 5, 6, 7] },
-            // ],
+            //需要的格子數
+            let colsTotal = weekNum * 7 //全部需要的格數
+            let colsArray = [] //存放所有的日期
+            for (let cols = 1 - this.firstDay; cols <= colsTotal; cols++) {
+                if (cols > 0 && cols <= this.lastDay) colsArray.push(cols)
+                else colsArray.push(null)
+            }
+
+            //切割陣列 每7個為一個陣列
+            for (let week = 1; week <= weekNum; week++) {
+                let array = colsArray.slice(7 * (week - 1), week * 7)
+                this.weeks.push({
+                    currentWeek: week,
+                    week: array,
+                })
+            }
+            console.log(this.weeks)
         },
         /**
          *  firstDay 第一天從星期幾開始
@@ -161,15 +118,11 @@ export default {
             //回傳前記得轉成整數
             return parseInt(weekNum)
         },
-        //設定日期
-        setDay(cells, rowIndex) {
-            return '11'
-        },
     },
     mounted() {
         this.getYearRange()
         this.buildCalendar(this.nowYear, this.nowMonth)
-        // this.buildCalendar(2020, 1)
+        // this.buildCalendar(2021, 0)
         console.log(new Date().getMonth())
     },
 }
@@ -189,9 +142,32 @@ export default {
     padding: 20px 15px;
 
     .year-month {
+        position: relative;
         text-align: center;
         font-weight: bolder;
         margin-bottom: 10px;
+        .previous-month {
+            position: absolute;
+            top: 50%;
+            left: 20%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            display: inline-block;
+            border: 8px solid;
+            border-color: transparent #000000 transparent transparent;
+        }
+        .next-month {
+            position: absolute;
+            top: 50%;
+            left: 80%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            display: inline-block;
+            border: 8px solid;
+            border-color: transparent transparent transparent #000000;
+        }
     }
 
     > table {
