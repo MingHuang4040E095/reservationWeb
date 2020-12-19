@@ -112,9 +112,8 @@ export default {
         // 	return months
         // },
         buildCalendar(year, month) {
-            console.log(year, month)
-            this.firstDay = new Date(year, month, 1).getDay() //取得第一天是在禮拜幾
-            // console.log(this.firstDay)
+            //取得第一天是在禮拜幾
+            this.firstDay = new Date(year, month, 1).getDay()
             //取得每個月的最後一天
             this.lastDay = (() => {
                 let d = new Date(year, month, 1)
@@ -125,6 +124,15 @@ export default {
             //計算這個月一共有幾週
             this.weekNum = this.calculationWeekNum(this.firstDay, this.lastDay)
             console.log(this.firstDay, this.lastDay)
+
+            // weeks: [
+            //     { days: [1, 2, 3, 4, 5, 6, 7] },
+            //     { days: [1, 2, 3, 4, 5, 6, 7] },
+            //     { days: [1, 2, 3, 4, 5, 6, 7] },
+            //     { days: [1, 2, 3, 4, 5, 6, 7] },
+            //     { days: [1, 2, 3, 4, 5, 6, 7] },
+            //     { days: [1, 2, 3, 4, 5, 6, 7] },
+            // ],
         },
         /**
          *  firstDay 第一天從星期幾開始
