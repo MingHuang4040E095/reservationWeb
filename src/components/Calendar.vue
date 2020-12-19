@@ -2,36 +2,41 @@
     <div class="calendar">
         <!-- <button @click="buildCalendar(nowYear, nowMonth)">111</button> -->
         <div class="year-month">
-            <span class="previous-month"></span>
-            {{ nowYear }} {{ months[nowMonth].text }}
-            <span class="next-month"></span>
+            <span class="previous-month" @click="previousMonth"></span>
+            <span @click="monthListStatus = true">{{ nowYear }} {{ months[nowMonth].text }}</span>
+            <span class="next-month" @click="nextMonth"></span>
         </div>
-        <v-row class="text-center">
-            <v-col>Sun</v-col>
-            <v-col>Mon</v-col>
-            <v-col>Tue</v-col>
-            <v-col>Wed</v-col>
-            <v-col>Thu</v-col>
-            <v-col>Fri</v-col>
-            <v-col>Sat</v-col>
-        </v-row>
+        <template v-if="!monthListStatus">
+            <v-row class="text-center">
+                <v-col>Sun</v-col>
+                <v-col>Mon</v-col>
+                <v-col>Tue</v-col>
+                <v-col>Wed</v-col>
+                <v-col>Thu</v-col>
+                <v-col>Fri</v-col>
+                <v-col>Sat</v-col>
+            </v-row>
 
-        <v-row class="text-center" v-for="row in weeks" :key="row.currentWeek">
-            <v-col v-for="cells in row.week" :key="cells">
-                {{ cells }}
-            </v-col>
-        </v-row>
+            <v-row class="text-center" v-for="row in weeks" :key="row.currentWeek">
+                <v-col v-for="cells in row.week" :key="cells">
+                    {{ cells }}
+                </v-col>
+            </v-row>
+        </template>
 
         <!-- 選月份 -->
-        <!-- <v-row class="text-center">
-			<v-col cols="3" v-for="month in months" :key="month.value">{{ month.text }}</v-col>
-		</v-row> -->
+        <v-row class="text-center" v-if="monthListStatus">
+            <v-col cols="3" v-for="(month, index) in months" :key="month.value" @click="changeMonth(index)">{{
+                month.text
+            }}</v-col>
+        </v-row>
     </div>
 </template>
 <script>
 export default {
     data() {
         return {
+            monthListStatus: false,
             months: [
                 { text: 'Jan', value: '01' },
                 { text: 'Feb', value: '02' },
@@ -49,8 +54,6 @@ export default {
             nowYear: new Date().getFullYear(), //現在的年份
             nowMonth: new Date().getMonth(), //現在的月份 0 ~ 11 ，從0開始 0 === 1月 .... 11 === 12月
 
-            firstDay: null, //星期幾開始 0~6
-            lastDay: null, //最後一天是幾號   可以用來當這個月有幾天
             weekNum: 0, //這個月有幾週
             weeks: [],
         }
@@ -60,24 +63,56 @@ export default {
         getYearRange() {
             // alert(this.nowYear)
         },
+        changeMonth(month) {
+            this.nowMonth = month
+            this.buildCalendar(this.nowYear, this.nowMonth)
+            this.monthListStatus = false
+        },
+        //上個月
+        previousMonth() {
+            this.nowMonth = this.nowMonth - 1
+            if (this.nowMonth < 0) {
+                //如果小於0 代表要回到上一年的12月，12月的話要 this.month要等於 11
+                this.nowMonth = 11
+                this.nowYear = this.nowYear - 1
+                this.buildCalendar(this.nowYear, this.nowMonth)
+            } else {
+                this.buildCalendar(this.nowYear, this.nowMonth)
+            }
+        },
+        //下個月
+        nextMonth() {
+            this.nowMonth = this.nowMonth + 1
+            if (this.nowMonth > 11) {
+                //如果大於11 代表要去下一年的1月，1月的話要 this.month要等於 0
+                this.nowMonth = 0
+                this.nowYear = this.nowYear + 1
+                this.buildCalendar(this.nowYear, this.nowMonth)
+            } else {
+                this.buildCalendar(this.nowYear, this.nowMonth)
+            }
+        },
+        //計算萬年曆
         buildCalendar(year, month) {
+            this.weeks = [] //清空陣列
+
             //取得第一天是在禮拜幾
-            this.firstDay = new Date(year, month, 1).getDay()
+            let firstDay = new Date(year, month, 1).getDay()
             //取得每個月的最後一天
-            this.lastDay = (() => {
+            let lastDay = (() => {
                 let d = new Date(year, month, 1)
                 d.setMonth(d.getMonth() + 1)
                 d.setDate(0)
                 return d.getDate()
             })()
             //計算這個月一共有幾週
-            let weekNum = this.calculationWeekNum(this.firstDay, this.lastDay)
+            let weekNum = this.calculationWeekNum(firstDay, lastDay)
 
             //需要的格子數
             let colsTotal = weekNum * 7 //全部需要的格數
             let colsArray = [] //存放所有的日期
-            for (let cols = 1 - this.firstDay; cols <= colsTotal; cols++) {
-                if (cols > 0 && cols <= this.lastDay) colsArray.push(cols)
+            for (let cols = 1 - firstDay; cols <= colsTotal; cols++) {
+                if (cols > 0 && cols <= lastDay) colsArray.push(cols)
                 else colsArray.push(null)
             }
 
@@ -122,8 +157,6 @@ export default {
     mounted() {
         this.getYearRange()
         this.buildCalendar(this.nowYear, this.nowMonth)
-        // this.buildCalendar(2021, 0)
-        console.log(new Date().getMonth())
     },
 }
 </script>
@@ -147,6 +180,7 @@ export default {
         font-weight: bolder;
         margin-bottom: 10px;
         .previous-month {
+            cursor: pointer;
             position: absolute;
             top: 50%;
             left: 20%;
@@ -158,10 +192,11 @@ export default {
             border-color: transparent #000000 transparent transparent;
         }
         .next-month {
+            cursor: pointer;
             position: absolute;
             top: 50%;
-            left: 80%;
-            transform: translate(-50%, -50%);
+            right: 20%;
+            transform: translate(50%, -50%);
             width: 0;
             height: 0;
             display: inline-block;
