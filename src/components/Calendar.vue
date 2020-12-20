@@ -1,13 +1,17 @@
 <template>
     <div class="calendar">
-        <!-- <button @click="buildCalendar(nowYear, nowMonth)">111</button> -->
         <div class="year-month">
-            <span class="previous-month" @click="previousMonth"></span>
-            <span @click="monthListStatus = true">{{ nowYear }} {{ months[nowMonth].text }}</span>
-            <span class="next-month" @click="nextMonth"></span>
+            <span class="previous-btn" @click="previousHandler"></span>
+            <span class="font-weight-black label-year" @click="monthListStatus = !monthListStatus">
+                {{ nowYear }}
+                <template v-if="!monthListStatus">
+                    {{ months[nowMonth].text }}
+                </template>
+            </span>
+            <span class="next-btn" @click="nextHandler"></span>
         </div>
-        <template v-if="!monthListStatus">
-            <v-row class="text-center">
+        <div class="date-block" v-if="!monthListStatus">
+            <v-row class="text-center font-weight-medium date-header">
                 <v-col>Sun</v-col>
                 <v-col>Mon</v-col>
                 <v-col>Tue</v-col>
@@ -17,18 +21,25 @@
                 <v-col>Sat</v-col>
             </v-row>
 
-            <v-row class="text-center" v-for="row in weeks" :key="row.currentWeek">
+            <v-row class="text-center date-content" v-for="row in weeks" :key="row.currentWeek">
                 <v-col v-for="cells in row.week" :key="cells">
-                    {{ cells }}
+                    <button class="date">
+                        {{ cells }}
+                    </button>
                 </v-col>
             </v-row>
-        </template>
+        </div>
 
         <!-- 選月份 -->
-        <v-row class="text-center" v-if="monthListStatus">
-            <v-col cols="3" v-for="(month, index) in months" :key="month.value" @click="changeMonth(index)">{{
-                month.text
-            }}</v-col>
+        <v-row class="text-center month-block" v-if="monthListStatus">
+            <v-col
+                class="month px-1 py-3"
+                cols="3"
+                v-for="(month, index) in months"
+                :key="month.value"
+                @click="changeMonth(index)"
+                >{{ month.text }}</v-col
+            >
         </v-row>
     </div>
 </template>
@@ -51,11 +62,17 @@ export default {
                 { text: 'Nov', value: '11' },
                 { text: 'Dec', value: '12' },
             ],
-            nowYear: new Date().getFullYear(), //現在的年份
-            nowMonth: new Date().getMonth(), //現在的月份 0 ~ 11 ，從0開始 0 === 1月 .... 11 === 12月
+            thisYear: new Date().getFullYear(), // 今年
+            thisMonth: new Date().getMonth(), //當前月份
+
+            nowYear: new Date().getFullYear(), //現在所選的年份
+            nowMonth: new Date().getMonth(), //現在所選的月份 0 ~ 11 ，從0開始 0 === 1月 .... 11 === 12月
 
             weekNum: 0, //這個月有幾週
             weeks: [],
+
+            startDate: null, //開始的日子
+            endDate: null, //結束的日子
         }
     },
     computed: {},
@@ -67,6 +84,28 @@ export default {
             this.nowMonth = month
             this.buildCalendar(this.nowYear, this.nowMonth)
             this.monthListStatus = false
+        },
+        //上一個月/年
+        previousHandler() {
+            if (this.monthListStatus) {
+                /**
+                 * 如果月份的清單被打開，代表點擊箭頭的時候要去變更年份
+                 */
+                this.nowYear = this.nowYear - 1
+            } else {
+                this.previousMonth()
+            }
+        },
+        //下一個月/年
+        nextHandler() {
+            if (this.monthListStatus) {
+                /**
+                 * 如果月份的清單被打開，代表點擊箭頭的時候要去變更年份
+                 */
+                this.nowYear = this.nowYear + 1
+            } else {
+                this.nextMonth()
+            }
         },
         //上個月
         previousMonth() {
@@ -120,6 +159,8 @@ export default {
             for (let week = 1; week <= weekNum; week++) {
                 let array = colsArray.slice(7 * (week - 1), week * 7)
                 this.weeks.push({
+                    year: this.nowYear,
+                    month: this.nowMonth, //一月 = 0 、 二月 = 1
                     currentWeek: week,
                     week: array,
                 })
@@ -160,7 +201,7 @@ export default {
     },
 }
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .calendar {
     position: relative;
     top: 50%;
@@ -179,7 +220,10 @@ export default {
         text-align: center;
         font-weight: bolder;
         margin-bottom: 10px;
-        .previous-month {
+        .label-year {
+            cursor: pointer;
+        }
+        .previous-btn {
             cursor: pointer;
             position: absolute;
             top: 50%;
@@ -191,7 +235,7 @@ export default {
             border: 8px solid;
             border-color: transparent #000000 transparent transparent;
         }
-        .next-month {
+        .next-btn {
             cursor: pointer;
             position: absolute;
             top: 50%;
@@ -205,11 +249,31 @@ export default {
         }
     }
 
-    > table {
-        width: 100%;
+    .date-block {
+        .date-content {
+            .date {
+                // font-size: 28px !important;
+                width: 30px;
+                height: 30px;
+                display: inline-block;
+                border-radius: 50%;
+                padding: 0;
+                &:focus {
+                    outline: 0;
+                    border: none;
+                }
+                &:hover {
+                    background-color: #f8f1ea;
+                    color: #969696;
+                }
+            }
+        }
+    }
 
-        td {
-            text-align: center;
+    .month-block {
+        .month {
+            cursor: pointer;
+            box-sizing: border-box;
         }
     }
 }
