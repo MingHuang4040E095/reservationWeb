@@ -23,7 +23,12 @@
 
             <v-row class="text-center date-content" v-for="row in weeks" :key="row.currentWeek">
                 <v-col v-for="cells in row.week" :key="cells">
-                    <button class="date">
+                    <button
+                        class="date"
+                        :disabled="cells < toDay || row.month < thisMonth || row.year < thisYear"
+                        :class="{ past: cells < toDay || row.month < thisMonth || row.year < thisYear }"
+                        @click="test(cells)"
+                    >
                         {{ cells }}
                     </button>
                 </v-col>
@@ -64,6 +69,7 @@ export default {
             ],
             thisYear: new Date().getFullYear(), // 今年
             thisMonth: new Date().getMonth(), //當前月份
+            toDay: new Date().getDate(), //今天是幾號
 
             nowYear: new Date().getFullYear(), //現在所選的年份
             nowMonth: new Date().getMonth(), //現在所選的月份 0 ~ 11 ，從0開始 0 === 1月 .... 11 === 12月
@@ -77,6 +83,9 @@ export default {
     },
     computed: {},
     methods: {
+        test(i) {
+            alert(i)
+        },
         getYearRange() {
             // alert(this.nowYear)
         },
@@ -252,6 +261,7 @@ export default {
     .date-block {
         .date-content {
             .date {
+                cursor: pointer;
                 // font-size: 28px !important;
                 width: 30px;
                 height: 30px;
@@ -265,6 +275,14 @@ export default {
                 &:hover {
                     background-color: #f8f1ea;
                     color: #969696;
+                }
+            }
+            .past {
+                cursor: default;
+                color: #ccc;
+                &:hover {
+                    background-color: transparent;
+                    color: #ccc;
                 }
             }
         }
