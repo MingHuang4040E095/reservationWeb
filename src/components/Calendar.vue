@@ -11,6 +11,9 @@
             <span class="next-btn" @click="nextHandler"></span>
         </div>
         <div class="date-block" v-if="!monthListStatus">
+            <v-row class="text-center font-weight-medium" justify="center" style="color:#f3be89;">
+                Check In ~ Check Out
+            </v-row>
             <v-row class="text-center font-weight-medium date-header">
                 <v-col>Sun</v-col>
                 <v-col>Mon</v-col>
@@ -22,14 +25,20 @@
             </v-row>
 
             <v-row class="text-center date-content" v-for="row in weeks" :key="row.currentWeek">
-                <v-col v-for="cells in row.week" :key="cells">
+                <v-col v-for="cells in row.week" :key="cells.day">
                     <button
                         class="date"
-                        :disabled="cells < toDay || row.month < thisMonth || row.year < thisYear"
-                        :class="{ past: cells < toDay || row.month < thisMonth || row.year < thisYear }"
-                        @click="test(cells)"
+                        :disabled="cells.isPast"
+                        :class="[
+                            cells.isPast ? 'past' : '',
+                            startDate === `${cells.day}/${nowMonth + 1}/${nowYear}` ||
+                            endDate === `${cells.day}/${nowMonth + 1}/${nowYear}`
+                                ? 'selected'
+                                : '',
+                        ]"
+                        @click="setDateRange(cells.day)"
                     >
-                        {{ cells }}
+                        {{ cells.day }}
                     </button>
                 </v-col>
             </v-row>
@@ -43,8 +52,17 @@
                 v-for="(month, index) in months"
                 :key="month.value"
                 @click="changeMonth(index)"
-                >{{ month.text }}</v-col
             >
+                {{ month.text }}
+            </v-col>
+        </v-row>
+        <v-row class="d-flex justify-end">
+            <v-btn text color="#545454" @click="closeCalendar">
+                Close
+            </v-btn>
+            <v-btn text color="#545454" @click="sendDate">
+                Confirm
+            </v-btn>
         </v-row>
     </div>
 </template>
@@ -77,20 +95,60 @@ export default {
             weekNum: 0, //這個月有幾週
             weeks: [],
 
-            startDate: null, //開始的日子
-            endDate: null, //結束的日子
+            selectedNum: 0, //選擇的狀態
+            startDate: '', //開始的日子
+            endDate: '', //結束的日子
+
+            startDay: '', //只顯示幾號 開始
+            endDay: '', //只顯示幾號 結束
         }
     },
     computed: {},
     methods: {
-        test(i) {
-            alert(i)
+        //關閉萬年曆
+        closeCalendar() {
+            this.$emit('close', false)
+        },
+        //傳送所選擇的日期
+        sendDate() {
+            let data = {
+                startDate: this.startDate,
+                endDate: this.endDate,
+            }
+            this.$emit('setDate', data)
+        },
+        setPastDate(date, month, year) {
+            if (!date) return true //如果傳過來的日期是null，就讓他變disable
+
+            let fullDate = `${year}/${month + 1}/${date}`
+            let today = `${this.thisYear}/${this.thisMonth + 1}/${this.toDay}`
+            let fullDateTime = new Date(fullDate).getTime()
+            let todayTime = new Date(today).getTime()
+            return fullDateTime < todayTime ? true : false
+            // if(fullDateTime < todayTime) return
+        },
+        //設定日期
+        setDateRange(date) {
+            if (this.selectedNum === 0 || this.selectedNum === 2) {
+                if (this.selectedNum === 2) {
+                    this.selectedNum = 0
+                    this.endDay = ''
+                    this.endDate = ''
+                }
+                this.startDay = date
+                this.startDate = `${date}/${this.nowMonth + 1}/${this.nowYear}`
+            } else if (this.selectedNum === 1) {
+                this.endDay = date
+                this.endDate = `${date}/${this.nowMonth + 1}/${this.nowYear}`
+            }
+            this.selectedNum++
         },
         getYearRange() {
             // alert(this.nowYear)
         },
         changeMonth(month) {
             this.nowMonth = month
+            console.log(this.nowYear, this.nowMonth)
             this.buildCalendar(this.nowYear, this.nowMonth)
             this.monthListStatus = false
         },
@@ -167,11 +225,21 @@ export default {
             //切割陣列 每7個為一個陣列
             for (let week = 1; week <= weekNum; week++) {
                 let array = colsArray.slice(7 * (week - 1), week * 7)
+                let newArray = []
+                array.forEach((day) => {
+                    console.log(day)
+                    let isPast = this.setPastDate(day, this.nowMonth, this.nowYear)
+                    newArray.push({
+                        day: day,
+                        year: this.nowYear,
+                        month: this.nowMonth,
+                        isPast: isPast,
+                    })
+                })
+
                 this.weeks.push({
-                    year: this.nowYear,
-                    month: this.nowMonth, //一月 = 0 、 二月 = 1
                     currentWeek: week,
-                    week: array,
+                    week: newArray,
                 })
             }
             console.log(this.weeks)
@@ -212,13 +280,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .calendar {
-    position: relative;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
+    // height: 450px;
     background: #ffffff;
     border: 1px solid #ccc;
     border-radius: 3px;
@@ -284,6 +353,12 @@ export default {
                     background-color: transparent;
                     color: #ccc;
                 }
+            }
+            .selected {
+                background-color: #fbdcbe;
+                border-radius: 50%;
+                color: rgb(251 140 0 / 70%);
+                font-weight: 700;
             }
         }
     }
