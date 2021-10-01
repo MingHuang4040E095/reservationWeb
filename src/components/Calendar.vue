@@ -11,9 +11,9 @@
             <span class="next-btn" @click="nextHandler"></span>
         </div>
         <div class="date-block" v-if="!monthListStatus">
-            <v-row class="text-center font-weight-medium" justify="center" style="color:#f3be89;">
+            <!-- <v-row class="text-center font-weight-medium" justify="center" style="color:#f3be89;">
                 Check In ~ Check Out
-            </v-row>
+            </v-row> -->
             <v-row class="text-center font-weight-medium date-header">
                 <v-col>Sun</v-col>
                 <v-col>Mon</v-col>
@@ -116,6 +116,7 @@ export default {
                 endDate: this.endDate,
             }
             this.$emit('setDate', data)
+            this.$emit('close', false)
         },
         setPastDate(date, month, year) {
             if (!date) return true //如果傳過來的日期是null，就讓他變disable
