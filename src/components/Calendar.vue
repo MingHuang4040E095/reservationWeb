@@ -293,6 +293,7 @@ export default {
     border: 1px solid #ccc;
     border-radius: 3px;
     padding: 20px 15px;
+    z-index: 999;
 
     .year-month {
         position: relative;
