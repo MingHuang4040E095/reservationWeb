@@ -124,8 +124,12 @@
                                 <button @click="kidsNumCount('plus')">+</button>
                             </div>
                         </v-col>
-                        <v-col cols="6" md="2">
-                            <button class="date-block__btn-search">Search</button>
+                        <v-col cols="12" md="4">
+                            <v-row justify="center" justify-md="end">
+                                <button class="date-block__btn-search" style="background:#000000;color:#ffffff;">
+                                    BOOK NOW
+                                </button>
+                            </v-row>
                         </v-col>
                     </v-row>
                 </v-container>
