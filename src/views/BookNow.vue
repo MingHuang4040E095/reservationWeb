@@ -39,6 +39,74 @@
                 </v-row>
             </v-container>
         </v-row>
+        <v-row>
+            <v-container>
+                <v-row class="px-10 py-3" align="center">
+                    <v-col cols="12" class="text-h4 font-weight-bold">Almost done!</v-col>
+                    <v-col cols="12">
+                        <div class="mb-3">
+                            您將預訂的房型為<span
+                                class="ml-3 text-h4 font-weight-bold"
+                                style="border-bottom:1px solid #000000"
+                                >{{ 'sadas' }}</span
+                            >
+                        </div>
+                        <div>請填寫以下資料，即可完成訂房。</div>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        <v-row>
+                            <v-col class="booknow__form-item" cols="12" md="4">
+                                <div class="booknow__form-label">真實姓名</div>
+                                <div>
+                                    <input
+                                        class="px-4"
+                                        type="text"
+                                        style="border: 1px solid #D1C8C3;box-sizing:border-box"
+                                    />
+                                </div>
+                            </v-col>
+                            <v-col class="booknow__form-item" cols="12" md="4">
+                                <div class="booknow__form-label">Check In</div>
+                                <div>
+                                    <button class="date-block__btn" @click="selectDateRange">
+                                        <span style="letter-spacing: 2px;">{{ startDate }}</span>
+                                        <v-icon right color="#000000">
+                                            mdi-calendar-range
+                                        </v-icon>
+                                    </button>
+                                </div>
+                            </v-col>
+                        </v-row>
+                        <v-row>
+                            <v-col class="booknow__form-item" cols="12" md="4">
+                                <div class="booknow__form-label">手機號碼</div>
+                                <div>
+                                    <input
+                                        class="px-4"
+                                        type="text"
+                                        style="border: 1px solid #D1C8C3;box-sizing:border-box"
+                                    />
+                                </div>
+                            </v-col>
+                            <v-col class="booknow__form-item" cols="12" md="4">
+                                <div class="booknow__form-label">Check Out</div>
+                                <div>
+                                    <button class="date-block__btn" @click="selectDateRange">
+                                        <span style="letter-spacing: 2px;">{{ endDate }}</span>
+                                        <v-icon right color="#000000">
+                                            mdi-calendar-range
+                                        </v-icon>
+                                    </button>
+                                </div>
+                            </v-col>
+                        </v-row>
+                    </v-col>
+                    <v-col cols="12" md="6">
+                        1
+                    </v-col>
+                </v-row>
+            </v-container>
+        </v-row>
         <Calendar v-show="visibleCalendar" @close="closeCalendar" @setDate="getDate" />
     </div>
 </template>
@@ -132,6 +200,27 @@ export default {
     }
     & + .date-block__count {
         margin-left: 1rem;
+    }
+}
+
+.booknow__form-item {
+    .booknow__form-label {
+        padding-left: 12px;
+        position: relative;
+        &::before {
+            content: '*';
+            position: absolute;
+            top: 0;
+            left: 0;
+            color: #c91616;
+        }
+    }
+    .date-block__btn {
+        border: 1px solid #d1c8c3;
+        box-sizing: border-box;
+    }
+    input {
+        padding: 5px 15px;
     }
 }
 </style>
