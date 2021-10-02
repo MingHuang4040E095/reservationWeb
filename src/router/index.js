@@ -22,6 +22,10 @@ const routes = [
     {
         path: '/booknow',
         name: 'BookNow',
+        props: (route) => ({
+            ...route.params,
+            ...route.query,
+        }),
         component: () => import('../views/BookNow.vue'),
     },
 ]

@@ -48,7 +48,7 @@
                             您將預訂的房型為<span
                                 class="ml-3 text-h4 font-weight-bold"
                                 style="border-bottom:1px solid #000000"
-                                >{{ 'sadas' }}</span
+                                >{{ roomType }}</span
                             >
                         </div>
                         <div>請填寫以下資料，即可完成訂房。</div>
@@ -105,7 +105,7 @@
                         <v-row>
                             <v-col class="text-center text-md-right" cols="12">
                                 平日
-                                <span class="text-h2 font-weight-medium">$ {{ 1000 }}</span>
+                                <span class="text-h2 font-weight-medium">$ {{ priceWeekdays }}</span>
                             </v-col>
                             <v-col class="text-center text-md-right" cols="12">
                                 <button
@@ -134,6 +134,23 @@ import Calendar from '@/components/Calendar.vue'
 export default {
     components: {
         Calendar,
+    },
+    props: {
+        //房型
+        roomType: {
+            type: String,
+            default: 'Single Room',
+        },
+        //平日
+        priceWeekdays: {
+            type: [String, Number],
+            default: 1380,
+        },
+        //假日
+        priceWeekend: {
+            type: [String, Number],
+            default: 1500,
+        },
     },
     data() {
         return {

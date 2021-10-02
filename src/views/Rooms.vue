@@ -67,10 +67,11 @@
                     <v-col class="px-10 px-md-2" cols="12" md="4">
                         <v-row class="pb-0 pb-md-15 font-weight-bold">
                             <v-col class="text-md-right" cols="6" md="12"
-                                >平日每晚 <span class="text-h4 d-flex d-sm-inline-flex">$ 1,380</span>
+                                >平日每晚
+                                <span class="text-h4 d-flex d-sm-inline-flex">$ {{ room.priceWeekdays }}</span>
                             </v-col>
                             <v-col class="text-md-right" cols="6" md="12"
-                                >假日每晚 <span class="text-h4 d-flex d-sm-inline-flex">$ 1,500</span>
+                                >假日每晚 <span class="text-h4 d-flex d-sm-inline-flex">$ {{ room.priceWeekend }}</span>
                             </v-col>
                         </v-row>
                         <v-row class="pt-0 pt-md-15">
@@ -80,7 +81,13 @@
                                 >
                             </v-col>
                             <v-col cols="6">
-                                <v-btn class="rounded-sm light-green white--text" block outlined>BOOK NOW</v-btn>
+                                <v-btn
+                                    class="rounded-sm light-green white--text"
+                                    @click="goPage('BookNow', room)"
+                                    block
+                                    outlined
+                                    >BOOK NOW</v-btn
+                                >
                             </v-col>
                         </v-row>
                     </v-col>
@@ -151,6 +158,17 @@ export default {
         getDate(dataRange) {
             this.startDate = dataRange.startDate
             this.endDate = dataRange.endDate
+        },
+        //跳頁
+        goPage(routeName, query) {
+            this.$router.push({
+                name: routeName,
+                query: {
+                    roomType: query.roomType, //房型
+                    priceWeekdays: query.priceWeekdays, //平日
+                    priceWeekend: query.priceWeekend, //假日
+                },
+            })
         },
     },
 }
