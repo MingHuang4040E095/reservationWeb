@@ -111,12 +111,14 @@
                                 <button
                                     class="date-block__btn-search"
                                     style="background:#ffffff;color:#000000;min-width: 111px;"
+                                    @click="$router.go(-1)"
                                 >
                                     BACK &lt;
                                 </button>
                                 <button
                                     class="date-block__btn-search ml-4"
                                     style="background:#000000;color:#ffffff;min-width: 111px;"
+                                    @click="dialogSuccess = true"
                                 >
                                     OK!
                                 </button>
@@ -127,6 +129,32 @@
             </v-container>
         </v-row>
         <Calendar v-show="visibleCalendar" @close="closeCalendar" @setDate="getDate" />
+        <v-dialog v-model="dialogSuccess" :width="dialogWidth">
+            <v-card class="pa-6">
+                <v-row>
+                    <v-col
+                        class="text-center"
+                        style="display: flex;align-items: center;justify-content: center;width:100%;"
+                        cols="12"
+                    >
+                        <v-icon class="text-h2" color="#31CE4F">mdi-check-circle-outline</v-icon>
+                        <span class="text-h4 ml-4">預訂成功!</span>
+                    </v-col>
+                    <v-col class="text-center" cols="12">
+                        您的預訂已完成，詳細訂房資訊已發送簡訊至您的手機，謝謝您！
+                    </v-col>
+                    <v-col class="text-center" cols="12">
+                        <button
+                            class="date-block__btn-search ml-4"
+                            style="background:#000000;color:#ffffff;min-width: 111px;"
+                            @click="dialogSuccess = false"
+                        >
+                            OK!
+                        </button>
+                    </v-col>
+                </v-row>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -152,6 +180,23 @@ export default {
             default: 1500,
         },
     },
+    computed: {
+        //詳細資料dialog的寬度
+        dialogWidth() {
+            switch (this.$vuetify.breakpoint.name) {
+                case 'xs':
+                    return '95%'
+                case 'sm':
+                    return '50%'
+                case 'md':
+                    return '50%'
+                case 'lg':
+                    return '50%'
+                case 'xl':
+                    return '50%'
+            }
+        },
+    },
     data() {
         return {
             adultsNum: 0,
@@ -159,6 +204,7 @@ export default {
             visibleCalendar: false, //是否可見萬年曆
             startDate: '開始日期', //開始日期
             endDate: '結束日期', //結束日期
+            dialogSuccess: false,
         }
     },
     methods: {
