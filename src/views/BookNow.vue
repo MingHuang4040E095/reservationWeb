@@ -101,8 +101,27 @@
                             </v-col>
                         </v-row>
                     </v-col>
-                    <v-col cols="12" md="6">
-                        1
+                    <v-col cols="12" md="6" align-self="end">
+                        <v-row>
+                            <v-col class="text-center text-md-right" cols="12">
+                                平日
+                                <span class="text-h2 font-weight-medium">$ {{ 1000 }}</span>
+                            </v-col>
+                            <v-col class="text-center text-md-right" cols="12">
+                                <button
+                                    class="date-block__btn-search"
+                                    style="background:#ffffff;color:#000000;min-width: 111px;"
+                                >
+                                    BACK &lt;
+                                </button>
+                                <button
+                                    class="date-block__btn-search ml-4"
+                                    style="background:#000000;color:#ffffff;min-width: 111px;"
+                                >
+                                    OK!
+                                </button>
+                            </v-col>
+                        </v-row>
                     </v-col>
                 </v-row>
             </v-container>
