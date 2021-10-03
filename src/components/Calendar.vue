@@ -143,6 +143,34 @@ export default {
                 this.endDate = `${date}/${this.nowMonth + 1}/${this.nowYear}`
             }
             this.selectedNum++
+
+            if (this.selectedNum !== 2) return
+            // 修正日期的排序
+            let handleSort = (startValue, endValue) => {
+                if (startValue > endValue) {
+                    // 如果開始日期的年or月or日 > 結束日期的年or月or日，則需對調
+                    let changeDate = this.startDate
+                    this.startDate = this.endDate
+                    this.endDate = changeDate
+                }
+            }
+
+            // 日期比大小  如果startDate比endDate大 就要調換順序
+            let startDateArray = this.startDate.split('/')
+            let endDateArray = this.endDate.split('/')
+
+            // -- 1.先比較年份
+            let startDateYear = Number(startDateArray[2])
+            let endDateYear = Number(endDateArray[2])
+            handleSort(startDateYear, endDateYear)
+            // -- 2.再比較月份
+            let startDateMonth = Number(startDateArray[1])
+            let endDateMonth = Number(endDateArray[1])
+            handleSort(startDateMonth, endDateMonth)
+            // -- 3.最後比較日期
+            let startDateDay = Number(startDateArray[0])
+            let endDateDay = Number(endDateArray[0])
+            handleSort(startDateDay, endDateDay)
         },
         getYearRange() {
             // alert(this.nowYear)
